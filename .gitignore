@@ -317,4 +317,4 @@ http-client.private.env.json
 
 # Exclude logs directory
 logs/*
-data/*
+data/*.DS_Store
