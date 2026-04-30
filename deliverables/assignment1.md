@@ -40,3 +40,32 @@ Problème de classification à 3 classes
 ## Métrique d'évaluation :
 - Accuracy
 - F1-score (weighted) pour tenir compte du class imbalance
+
+## Description des features disponibles :
+- `home_team` : équipe qui joue à domicile
+- `away_team` : équipe qui joue à l'extérieur
+- `tournament` : type de compétition (Coupe du Monde, amical, qualifications...)
+- `city` : ville où se joue le match
+- `country` : pays hôte
+- `neutral` : booléen, True si le match se joue sur terrain neutre
+- `date` : date du match (permettra d'extraire l'année, le mois...)
+- `home_score` / `away_score` : scores (utilisés uniquement pour créer la variable cible)
+
+## Contexte machine learning :
+Problème de classification supervisée à 3 classes (Home Win / Draw / Away Win).
+Les modèles envisagés sont :
+- Logistic Regression (baseline)
+- Random Forest
+- XGBoost
+
+## Comment obtenir les données :
+Dataset téléchargé manuellement depuis Kaggle :
+https://www.kaggle.com/datasets/martj42/international-football-results-from-1872-to-2017
+Les fichiers CSV sont à placer dans le dossier `data/` du repository.
+Ce dossier est ignoré par Git (.gitignore) pour éviter de pusher des fichiers lourds.
+
+## Comment exécuter le notebook :
+1. Placer les fichiers CSV dans le dossier `data/`
+2. Ouvrir `notebooks/data_exploration.ipynb` dans VS Code ou Jupyter
+3. Mettre à jour le chemin des fichiers si nécessaire
+4. Exécuter toutes les cellules dans l'ordre
