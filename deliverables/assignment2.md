@@ -5,6 +5,12 @@
 - Filtrage des matchs avant 1990 (données trop bruitées)
 - Résultat : 32 101 matchs utilisables
 
+## Merge avec goalscorers.csv :
+- Ajout d'une feature `total_goals_scored` par match
+- Merge sur date, home_team, away_team
+- Les matchs sans buteurs dans goalscorers.csv ont été remplis avec 0
+- Feature à utiliser avec précaution car beaucoup de 0 (matchs non référencés)
+
 ## Nouvelles features créées :
 - `year` : année extraite de la date
 - `month` : mois extrait de la date
