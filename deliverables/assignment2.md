@@ -15,6 +15,17 @@
 - `city` / `country` : trop de modalités, peu d'impact attendu
 - `date` : remplacée par year et month
 
+## Test skrub (TableVectorizer) :
+- Testé comme alternative au LabelEncoder
+- Crée automatiquement 93 features via One-Hot Encoding
+- Trop de dimensions pour notre dataset (risque d'overfitting)
+- Alternative non retenue, on préfère le LabelEncoder (6 features)
+
+## Visualisations :
+- Distribution des résultats : class imbalance visible (Home Win 48%)
+- Heatmap de corrélation : corrélations très faibles entre les features
+- Top 10 des tournois : les matchs amicaux dominent largement
+
 ## Transformations appliquées :
 - LabelEncoder sur home_team, away_team, tournament, result
 - Conversion de neutral (bool -> int)
@@ -29,6 +40,13 @@
 - One-Hot Encoding sur les équipes : trop de colonnes (300+ équipes)
 - PCA : La variance est répartie uniformément entre les 6 composantes (~17% chacune). Il faut 5 composantes pour expliquer 86% de la variance. Le PCA n'apporte pas de réduction utile ici. On conserve les 6 features originales sans PCA
 - Données avant 1990 : trop bruitées
+
+## Test skrub (TableVectorizer) :
+- Testé comme alternative au LabelEncoder
+- Crée automatiquement 93 features via One-Hot Encoding
+- Trop de dimensions pour notre dataset (risque d'overfitting)
+- Alternative non retenue, on préfère le LabelEncoder (6 features)
+
 
 ## Impact attendu :
 - LabelEncoding simple et efficace pour les équipes
