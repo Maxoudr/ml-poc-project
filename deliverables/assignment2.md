@@ -16,6 +16,12 @@
 - `month` : mois extrait de la date
 - `result` : variable cible (Home Win / Draw / Away Win)
 
+## Nouvelles features forme récente :
+- `home_form` : % de victoires de l'équipe domicile sur ses 10 derniers matchs
+- `away_form` : % de victoires de l'équipe extérieur sur ses 10 derniers matchs
+- Ces features capturent la forme récente des équipes
+- Valeur neutre 0.5 si pas d'historique disponible
+
 ## Features supprimées :
 - `home_score` / `away_score` : utilisées uniquement pour créer la cible
 - `city` / `country` : trop de modalités, peu d'impact attendu
