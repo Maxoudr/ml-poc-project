@@ -318,3 +318,4 @@ http-client.private.env.json
 # Exclude logs directory
 logs/*
 data/*.DS_Store
+models/*
