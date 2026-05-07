@@ -59,6 +59,20 @@
 - Trop de dimensions pour notre dataset (risque d'overfitting)
 - Alternative non retenue, on préfère le LabelEncoder (6 features)
 
+## Mise à jour - Nouvelles features ajoutées :
+- `is_friendly` : booléen, True si le match est amical
+- `h2h` : historique head-to-head entre les deux équipes
+- `home_fifa_rank` : ranking FIFA de l'équipe domicile
+- `away_fifa_rank` : ranking FIFA de l'équipe extérieure
+
+## Dataset FIFA ranking :
+- Source : Kaggle - fifa_ranking-2023-07-20.csv
+- Merger sur la date la plus proche avant le match
+- Valeur par défaut 150 si pas de ranking disponible
+
+## Features finales (12 au total) :
+home_team_enc, away_team_enc, tournament_enc, neutral, year, month, 
+home_form, away_form, is_friendly, h2h, home_fifa_rank, away_fifa_rank
 
 ## Impact attendu :
 - LabelEncoding simple et efficace pour les équipes
