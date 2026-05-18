@@ -8,7 +8,7 @@ import streamlit as st
 import joblib
 import plotly.graph_objects as go
 
-from config import MODELS_DIR
+from config import MODELS_DIR,PLOTS_DIR
 
 # Équipes avec drapeaux et rankings FIFA réels
 TEAMS = {
@@ -284,10 +284,9 @@ def build_app() -> None:
         """, unsafe_allow_html=True)
         st.markdown("---")
         
-        menu = st.radio(
-            "",
-            ["🏠  Projet", "📊  Modèles", "⚽  Démo"],
-            label_visibility="collapsed"
+        menu = st.sidebar.radio(
+    "",
+    ["🏠  Projet", "📊  Modèles", "⚽  Démo", "💰 Simulation  Paris"],
         )
         
         st.markdown("---")
@@ -374,6 +373,10 @@ def build_app() -> None:
         }
         st.dataframe(pd.DataFrame(features_data), use_container_width=True, hide_index=True)
 
+        st.markdown("---")
+        st.markdown("### 📈 Analyse exploratoire")
+        st.image(str(PLOTS_DIR / "eda_results_by_year.png"), use_container_width=True, caption="Evolution des résultats par année")
+
     # ==================== PAGE MODÈLES ====================
     elif "Modèles" in menu:
         st.markdown('<div class="main-title">📊 COMPARAISON DES MODÈLES</div>', unsafe_allow_html=True)
@@ -416,6 +419,13 @@ def build_app() -> None:
             yaxis=dict(gridcolor='#222', range=[0, 0.7]),
         )
         st.plotly_chart(fig, use_container_width=True)
+
+        st.markdown("---")
+        st.markdown("### 📊 Courbes ROC")
+        st.image(str(PLOTS_DIR / "roc_curves.png"), use_container_width=True, caption="Courbes ROC des 3 modèles")
+
+        st.markdown("### 🎯 Matrice de confusion - Gradient Boosting")
+        st.image(str(PLOTS_DIR / "confusion_matrix.png"), use_container_width=True, caption="Matrice de confusion")
 
         st.markdown("---")
         st.markdown("### ℹ️ Détails des modèles")
@@ -583,6 +593,154 @@ def build_app() -> None:
                 height=350
             )
             st.plotly_chart(fig, use_container_width=True)
+
+
+             # ==================== PAGE PARIS ====================
+
+    elif "Paris" in menu:
+        st.markdown('<div class="main-title">💰 SIMULATION PARIS SPORTIFS</div>', unsafe_allow_html=True)
+        st.markdown('<div class="subtitle">Parcours du Brésil à la coupe du monde 2014</div>', unsafe_allow_html=True)
+        st.markdown("---")
+
+        # Matchs du parcours du Brésil
+        parcours = [
+    {"phase": "Groupe", "home": "Brésil", "away": "Croatie",
+     "home_rank": 4, "away_rank": 18, "home_form": 0.8, "away_form": 0.6,
+     "neutral": False, "is_friendly": False,
+     "vrai_resultat": "Home Win",
+     "cote_home": 1.45, "cote_draw": 4.2, "cote_away": 7.5},
+    {"phase": "Groupe", "home": "Brésil", "away": "Mexique",
+     "home_rank": 4, "away_rank": 20, "home_form": 0.8, "away_form": 0.6,
+     "neutral": False, "is_friendly": False,
+     "vrai_resultat": "Draw",
+     "cote_home": 1.60, "cote_draw": 3.8, "cote_away": 6.0},
+    {"phase": "Groupe", "home": "Brésil", "away": "Cameroun",
+     "home_rank": 4, "away_rank": 50, "home_form": 0.8, "away_form": 0.4,
+     "neutral": False, "is_friendly": False,
+     "vrai_resultat": "Home Win",
+     "cote_home": 1.25, "cote_draw": 6.0, "cote_away": 12.0},
+    {"phase": "8èmes", "home": "Brésil", "away": "Chili",
+     "home_rank": 4, "away_rank": 14, "home_form": 0.8, "away_form": 0.7,
+     "neutral": False, "is_friendly": False,
+     "vrai_resultat": "Home Win",
+     "cote_home": 1.65, "cote_draw": 3.6, "cote_away": 5.5},
+    {"phase": "Quarts", "home": "Brésil", "away": "Colombie",
+     "home_rank": 4, "away_rank": 8, "home_form": 0.8, "away_form": 0.7,
+     "neutral": False, "is_friendly": False,
+     "vrai_resultat": "Home Win",
+     "cote_home": 1.70, "cote_draw": 3.5, "cote_away": 5.0},
+    {"phase": "Demis", "home": "Brésil", "away": "Allemagne",
+     "home_rank": 4, "away_rank": 2, "home_form": 0.7, "away_form": 0.8,
+     "neutral": False, "is_friendly": False,
+     "vrai_resultat": "Away Win",
+     "cote_home": 2.10, "cote_draw": 3.4, "cote_away": 3.4},
+    {"phase": "3ème place", "home": "Brésil", "away": "Pays-Bas",
+     "home_rank": 4, "away_rank": 5, "home_form": 0.5, "away_form": 0.7,
+     "neutral": False, "is_friendly": False,
+     "vrai_resultat": "Away Win",
+     "cote_home": 2.20, "cote_draw": 3.3, "cote_away": 3.3},
+]
+
+        model = joblib.load(MODELS_DIR / "gradient_boosting.joblib")
+        mise = 10  # €
+
+        st.markdown(f"### 💵 Mise par match : **{mise}€**")
+        st.markdown("---")
+
+        total_mise = 0
+        total_gains = 0
+        results_table = []
+
+        labels = ['Away Win', 'Draw', 'Home Win']
+
+        for match in parcours:
+            X = np.array([[
+                0, 1, 0,
+                int(match["neutral"]), 2022, 11,
+                match["home_form"], match["away_form"],
+                int(match["is_friendly"]), 0.5,
+                match["home_rank"], match["away_rank"]
+            ]])
+
+            pred = model.predict(X)[0]
+            prediction = labels[pred]
+            vrai = match["vrai_resultat"]
+
+            # Cote correspondant à la prédiction
+            if prediction == "Home Win":
+                cote_pariee = match["cote_home"]
+            elif prediction == "Draw":
+                cote_pariee = match["cote_draw"]
+            else:
+                cote_pariee = match["cote_away"]
+
+            # Calcul gain/perte
+            if prediction == vrai:
+                gain = round(mise * cote_pariee - mise, 2)
+                correct = "✅"
+            else:
+                gain = -mise
+                correct = "❌"
+
+            total_mise += mise
+            total_gains += gain
+
+            results_table.append({
+                "Phase": match["phase"],
+                "Match": f"{match['home']} vs {match['away']}",
+                "Prédiction": prediction,
+                "Résultat réel": vrai,
+                "Cote": cote_pariee,
+                "Gain/Perte": f"{'+' if gain > 0 else ''}{gain}€",
+                "": correct
+            })
+
+        # Afficher le tableau
+        df_results = pd.DataFrame(results_table)
+        st.dataframe(df_results, use_container_width=True, hide_index=True)
+
+        st.markdown("---")
+
+        # Bilan final
+        bilan = round(total_gains, 2)
+        col1, col2, col3 = st.columns(3)
+        col1.markdown(f'<div class="metric-box"><div class="metric-value" style="color:#ff4444">{total_mise}€</div><div class="metric-label">Total misé</div></div>', unsafe_allow_html=True)
+        col2.markdown(f'<div class="metric-box"><div class="metric-value" style="color:{"#00ff44" if bilan > 0 else "#ff4444"}">{("+" if bilan > 0 else "")}{bilan}€</div><div class="metric-label">Bilan net</div></div>', unsafe_allow_html=True)
+        col3.markdown(f'<div class="metric-box"><div class="metric-value" style="color:{"#00ff44" if bilan > 0 else "#ff4444"}">{round((bilan/total_mise)*100, 1)}%</div><div class="metric-label">ROI</div></div>', unsafe_allow_html=True)
+
+        # Graphique évolution
+        gains_cumules = []
+        cumul = 0
+        for match in results_table:
+            val = float(match["Gain/Perte"].replace("€","").replace("+",""))
+            cumul += val
+            gains_cumules.append(cumul)
+
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=[m["Phase"] + " - " + m["Match"].split(" vs ")[1] for m in results_table],
+            y=gains_cumules,
+            mode='lines+markers',
+            line=dict(color='#00ff44', width=3),
+            marker=dict(size=10, color=['#00ff44' if g >= 0 else '#ff4444' for g in gains_cumules]),
+            fill='tozeroy',
+            fillcolor='rgba(0,255,68,0.1)'
+        ))
+        fig.add_hline(y=0, line_dash="dash", line_color="white", opacity=0.5)
+        fig.update_layout(
+            title=dict(text='Evolution des gains cumulés', font=dict(size=18, color='white')),
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='white'),
+            xaxis=dict(gridcolor='#222'),
+            yaxis=dict(gridcolor='#222', ticksuffix='€'),
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        if bilan > 0:
+            st.success(f"🎉 En suivant les prédictions du modèle sur le parcours du Brésil, vous auriez gagné **{bilan}€** pour {total_mise}€ misés !")
+        else:
+            st.error(f"😔 En suivant les prédictions du modèle sur le parcours du Brésil, vous auriez perdu **{abs(bilan)}€** pour {total_mise}€ misés.")
 
 if __name__ == "__main__":
     build_app()
