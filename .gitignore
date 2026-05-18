@@ -319,3 +319,4 @@ http-client.private.env.json
 logs/*
 data/*.DS_Store
 models/*
+results/*
